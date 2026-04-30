@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Troco Inteligente PRO</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #fff;
+}
+
+/* CARD */
+.card {
+    width: 95%;
+    max-width: 400px;
+    padding: 25px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    animation: aparecer 0.8s ease;
+}
+
+@keyframes aparecer {
+    from {opacity:0; transform: translateY(30px);}
+    to {opacity:1; transform: translateY(0);}
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* INPUT */
+input {
+    width: 100%;
+    padding: 14px;
+    margin: 8px 0;
+    border-radius: 12px;
+    border: none;
+    font-size: 16px;
+    outline: none;
+}
+
+/* BOTÃO */
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(45deg, #00ffcc, #00ccff);
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
+
+/* RESULTADO */
+.result {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.4);
+    animation: aparecer 0.5s ease;
+}
+
+.sugestao {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #00ffcc;
+}
+
+.erro {
+    color: #ff4d4d;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <h1>💸 Troco PRO</h1>
+
+    <input type="number" id="valor" placeholder="Valor da compra (R$)">
+    <input type="number" id="pago" placeholder="Valor pago (R$)">
+
+    <button onclick="calcular()">Calcular</button>
+
+    <div class="result" id="resultado"></div>
+    <div class="sugestao" id="sugestao"></div>
+</div>
+
+<script>
+function calcular() {
+    let valor = parseFloat(document.getElementById("valor").value);
+    let pago = parseFloat(document.getElementById("pago").value);
+
+    let res = document.getElementById("resultado");
+    let sug = document.getElementById("sugestao");
+
+    if (isNaN(valor) || isNaN(pago)) {
+        res.innerHTML = "<span class='erro'>Preencha os valores!</span>";
+        sug.innerHTML = "";
+        return;
+    }
+
+    if (pago < valor) {
+        res.innerHTML = "<span class='erro'>Valor insuficiente!</span>";
+        sug.innerHTML = "";
+        return;
+    }
+
+    let troco = pago - valor;
+    res.innerHTML = "💰 Troco: R$ " + troco.toFixed(2);
+
+    gerarSugestao(troco);
+}
+
+function gerarSugestao(troco) {
+    let notas = [200, 100, 50, 20, 10, 5, 2, 1];
+    let moedas = [0.50, 0.25, 0.10, 0.05];
+
+    let texto = "";
+
+    notas.forEach(n => {
+        let qtd = Math.floor(troco / n);
+        if (qtd > 0) {
+            texto += `${qtd}x nota de R$${n}<br>`;
+            troco %= n;
+        }
+    });
+
+    moedas.forEach(m => {
+        let qtd = Math.floor((troco + 0.001) / m);
+        if (qtd > 0) {
+            texto += `${qtd}x moeda de R$${m.toFixed(2)}<br>`;
+            troco %= m;
+        }
+    });
+
+    document.getElementById("sugestao").innerHTML =
+        "💡 Melhor forma de dar o troco:<br>" + texto;
+}
+</script>
+
+</body>
+</html>
